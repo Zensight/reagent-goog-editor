@@ -1,22 +1,35 @@
 (ns ^:figwheel-no-load reagent-goog-editor.dev
-  (:require [reagent-goog-editor.core :as core]
-            [reagent.core :as reagent]
+  (:require [reagent.core :as reagent]
+            [reagent-goog-editor.core :as reagent-goog-editor]
             [figwheel.client :as figwheel :include-macros true]))
 
 (enable-console-print!)
 
-(def toolbar-node-id "toolbar")
-(def compose-node-id "composer")
+(def read-only (reagent/atom false))
+(def visible (reagent/atom true))
+(def value (reagent/atom ""))
 
-(defn demo-view []
+(defn component []
   [:div
-   [:div {:id toolbar-node-id}]
-   [:div {:class "composer"
-          :id compose-node-id}]])
+   [:table
+    [:tbody
+      [:tr
+       [:td
+        [:button
+         {:on-click #(swap! read-only not)}
+         "Enable/disable editor"]]
+       [:td
+        [:button
+         {:on-click #(swap! visible not)}
+         "Show/remove editor"]]]]]
+      [:hr]
+      (when @visible
+        [reagent-goog-editor/component {:read-only @read-only
+                                        :value-cursor value
+                                        :value @value}])])
 
 (defn render-demo []
-  (reagent/render [demo-view] (.getElementById js/document "app"))
-  (core/build-editor compose-node-id toolbar-node-id))
+  (reagent/render [component] (.getElementById js/document "app")))
 
 (figwheel/watch-and-reload
   :websocket-url "ws://localhost:3449/figwheel-ws"
