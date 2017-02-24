@@ -10,5 +10,10 @@
     :tooltip ""
     :caption ""
     :classes "tr-separator"
-    :factory (fn [_ _ _ _ opt_renderer opt_domHelper]
-               (goog.ui.ToolbarSeparator. opt_renderer opt_domHelper))})
+    :factory (fn [_ _ _ _ opt-renderer opt-dom-helper]
+               (let [separator (goog.ui.ToolbarSeparator. opt-renderer opt-dom-helper)]
+                  ;; Ensure the separator has a unique ID different from Google's uniq IDs by
+                  ;; prefixing generated ID with command name.
+                  (aset separator "id_" (str separator-command
+                                             (.. separator -idGenerator_ getNextUniqueId)))
+                  separator))})
