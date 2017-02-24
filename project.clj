@@ -8,8 +8,13 @@
                  [org.clojure/clojurescript "1.9.229" :scope "provided"]
                  [reagent "0.6.0"]]
 
+  :repositories {"zensight-builds" {:url "s3p://zensight-builds/"
+                                    :username :env/aws_access_key_id
+                                    :passphrase :env/aws_secret_access_key}}
+
   :plugins [[lein-cljsbuild "1.1.3"]
-            [lein-figwheel "0.5.4-5"]]
+            [lein-figwheel "0.5.4-5"]
+            [s3-wagon-private "1.2.0"]]
 
   :min-lein-version "2.5.0"
 
