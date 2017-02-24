@@ -89,6 +89,10 @@
          (events/listen field goog-event callback)
          (.warn js/console (str "Ignorning unknown event `" event-name "`"))))
 
+     ;; The field initial state is disabled, so set the controller/toolbar initial state to match.
+     (.setEnabled controller false)
+     (.setVisible controller false)
+
      {:controller controller
       :field field
       :toolbar toolbar})))
