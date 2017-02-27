@@ -75,6 +75,16 @@
   (let [node (dom/getElement node-id)]
     (.makeToolbar goog.ui.editor.DefaultToolbar (clj->js buttons) node)))
 
+(defn- calculate-base-z-index [node]
+  (let [z-ancestor (goog.dom/getAncestor
+                    node
+                    (fn [ancestor] (and (not= "#document" (.-nodeName ancestor))
+                                        (not= "auto" (aget (.getComputedStyle js/window ancestor) "z-index"))))
+                    false)]
+    (if z-ancestor
+      (int (aget (.getComputedStyle js/window z-ancestor) "z-index"))
+      0)))
+
 (defn create-editor
   ([field-node-id toolbar-node-id]
    (create-editor field-node-id toolbar-node-id {}))
@@ -82,7 +92,10 @@
    (let [field (create-field field-node-id)
          toolbar (create-toolbar toolbar-node-id)
          controller (goog.ui.editor.ToolbarController. field toolbar)
-         event-handlers (or (:events options) [])]
+         event-handlers (or (:events options) [])
+         base-z-index (calculate-base-z-index (.-originalElement field))]
+
+     (.setBaseZindex field base-z-index)
 
      (doseq [[event-name callback] event-handlers]
        (if-let [goog-event (events event-name)]
