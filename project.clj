@@ -8,7 +8,7 @@
                  [org.clojure/clojurescript "1.9.229" :scope "provided"]
                  [reagent "0.6.0"]]
 
-  :repositories {"zensight-builds" {:url "s3p://zensight-builds/"
+  :repositories {"releases" {:url "s3p://zensight-builds/"
                                     :username :env/aws_access_key_id
                                     :passphrase :env/aws_secret_access_key}}
 
