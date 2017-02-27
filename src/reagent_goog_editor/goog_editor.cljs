@@ -2,7 +2,7 @@
     (:require [reagent.core :as reagent]
               [goog.dom :as dom]
               [goog.editor.Command :as editor-command]
-              [goog.editor.Field :as editor-field]
+              [goog.editor.ContentEditableField :as editor-field]
               [goog.editor.Field.EventType :as event-type]
               [goog.editor.plugins.BasicTextFormatter :as basic-text-formatter]
               [goog.editor.plugins.EnterHandler :as enter-handler]
@@ -66,7 +66,7 @@
    :unload goog.editor.Field.EventType.UNLOAD})
 
 (defn- create-field [node-id]
-  (let [field (goog.editor.Field. node-id)]
+  (let [field (goog.editor.ContentEditableField. node-id)]
     (doseq [plugin plugins]
       (.registerPlugin field (new plugin)))
     field))
