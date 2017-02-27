@@ -138,12 +138,18 @@
 (defn get-field-contents [field]
   (.getCleanContents field))
 
-(defn set-html [editor html]
+(defn get-editor-contents [editor]
   (-> editor
-       :field
-      (.setHtml
-       ;; Don't add paragraph tags
-       false
-       html
-       ;; Suppress the delayedchange event
-       true)))
+      :field
+      get-field-contents))
+
+(defn set-html [editor html]
+  (when (not= html (get-editor-contents editor))
+    (-> editor
+         :field
+        (.setHtml
+         ;; Don't add paragraph tags
+         false
+         html
+         ;; Suppress the delayedchange event
+         true))))
