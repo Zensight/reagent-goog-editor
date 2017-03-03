@@ -26,7 +26,7 @@
       (when @visible
         [reagent-goog-editor/component {:field {:class-name "composer"}
                                         :read-only @read-only
-                                        :value-cursor value}])])
+                                        :value-ratom value}])])
 
 (defn render-demo []
   (reagent/render [component] (.getElementById js/document "app")))

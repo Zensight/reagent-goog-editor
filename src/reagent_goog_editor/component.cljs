@@ -19,7 +19,7 @@
   (reagent.impl.component/extract-props prop-wrapper))
 
 (defn component-did-mount [this]
-  (let [{:keys [read-only value-cursor]} (extract-props (.. this -props -argv))
+  (let [{:keys [read-only value-ratom]} (extract-props (.. this -props -argv))
         field-node (.. this -refs -field)
         toolbar-node (.. this -refs -toolbar)
         state-atom (reagent/state-atom this)
@@ -27,21 +27,21 @@
         toolbar-id (.-id toolbar-node)
         on-change (fn [evnt]
                    (let [contents (editor/get-field-contents (.-target evnt))]
-                     (reset! value-cursor contents)))
+                     (reset! value-ratom contents)))
         options {:events {:change on-change}}
         editor (editor/create-editor field-id toolbar-id options)]
 
     (set-editor-state editor {:read-only read-only
-                              :value @value-cursor})
+                              :value @value-ratom})
     (swap! state-atom assoc :editor editor)))
 
 (defn component-will-receive-props [this next-props]
   (let [props (extract-props next-props)
         state (reagent/state this)
-        {:keys [read-only value-cursor]} props
+        {:keys [read-only value-ratom]} props
         editor (:editor state)]
     (set-editor-state editor {:read-only read-only
-                              :value @value-cursor})))
+                              :value @value-ratom})))
 
 (defn component-will-unmount [this]
   (let [state (reagent/state this)
