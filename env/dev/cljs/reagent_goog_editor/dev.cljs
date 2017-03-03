@@ -24,9 +24,9 @@
          "Show/remove editor"]]]]]
       [:hr]
       (when @visible
-        [reagent-goog-editor/component {:read-only @read-only
-                                        :value-cursor value
-                                        :value @value}])])
+        [reagent-goog-editor/component {:field {:class-name "composer"}
+                                        :read-only @read-only
+                                        :value-cursor value}])])
 
 (defn render-demo []
   (reagent/render [component] (.getElementById js/document "app")))
