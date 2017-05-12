@@ -1,4 +1,4 @@
-(ns reagent-goog-editor.plugins.blockquote
+(ns reagent-goog-editor.editor-plugins.blockquote
   (:require [goog.editor.Plugin :as editor-plugin]
             [goog.dom :as dom])
   (:use-macros [reagent-goog-editor.macros :only [goog-extend]]))

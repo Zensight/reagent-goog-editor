@@ -17,19 +17,19 @@
               [goog.events :as events]
               [goog.ui.editor.DefaultToolbar :as default-toolbar]
               [goog.ui.editor.ToolbarController :as toolbar-controller]
-              [reagent-goog-editor.plugins.blockquote :as blockquote-plugin]
+              [reagent-goog-editor.editor-plugins.blockquote :as blockquote-plugin]
               [reagent-goog-editor.commands.separator :as separator]))
 
-(def plugins [goog.editor.plugins.BasicTextFormatter
-              goog.editor.plugins.EnterHandler
-              goog.editor.plugins.HeaderFormatter
-              goog.editor.plugins.LinkBubble
-              goog.editor.plugins.LinkDialogPlugin
-              goog.editor.plugins.ListTabHandler
-              goog.editor.plugins.RemoveFormatting
-              goog.editor.plugins.SpacesTabHandler
-              goog.editor.plugins.UndoRedo
-              blockquote-plugin/Blockquote])
+(def editor-plugins [goog.editor.plugins.BasicTextFormatter
+                     goog.editor.plugins.EnterHandler
+                     goog.editor.plugins.HeaderFormatter
+                     goog.editor.plugins.LinkBubble
+                     goog.editor.plugins.LinkDialogPlugin
+                     goog.editor.plugins.ListTabHandler
+                     goog.editor.plugins.RemoveFormatting
+                     goog.editor.plugins.SpacesTabHandler
+                     goog.editor.plugins.UndoRedo
+                     blockquote-plugin/Blockquote])
 
 (def buttons [goog.editor.Command.FONT_FACE
               goog.editor.Command.FONT_SIZE
@@ -67,7 +67,7 @@
 
 (defn- create-field [node-id]
   (let [field (goog.editor.ContentEditableField. node-id)]
-    (doseq [plugin plugins]
+    (doseq [plugin editor-plugins]
       (.registerPlugin field (new plugin)))
     field))
 
