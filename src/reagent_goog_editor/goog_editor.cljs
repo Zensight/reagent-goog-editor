@@ -14,7 +14,6 @@
               [goog.editor.plugins.RemoveFormatting :as remove-formatting]
               [goog.editor.plugins.SpacesTabHandler :as spaces-tab-handler]
               [goog.editor.plugins.UndoRedo :as undo-redo]
-              [goog.events :as events]
               [goog.ui.editor.DefaultToolbar :as default-toolbar]
               [goog.ui.editor.ToolbarController :as toolbar-controller]
               [reagent-goog-editor.editor-plugins.blockquote :as blockquote-plugin]
@@ -53,27 +52,15 @@
               separator/SEPARATOR
               goog.editor.Command.REMOVE_FORMAT])
 
-(def events
-  {:before-change goog.editor.Field.EventType.BEFORECHANGE
-   :before-selection-change goog.editor.Field.EventType.BEFORESELECTIONCHANGE
-   :blur goog.editor.Field.EventType.BLUR
-   :command-value-change goog.editor.Field.EventType.COMMAND_VALUE_CHANGE
-   ;; delayed-change is the defacto change event according to goog.editor
-   :change goog.editor.Field.EventType.DELAYEDCHANGE
-   :focus goog.editor.Field.EventType.FOCUS
-   :load goog.editor.Field.EventType.LOAD
-   :selection-change goog.editor.Field.EventType.SELECTIONCHANGE
-   :unload goog.editor.Field.EventType.UNLOAD})
-
 (defn- create-field [node-id]
   (let [field (goog.editor.ContentEditableField. node-id)]
     (doseq [plugin editor-plugins]
       (.registerPlugin field (new plugin)))
     field))
 
-(defn- create-toolbar [node-id]
+(defn- create-toolbar [node-id items]
   (let [node (dom/getElement node-id)]
-    (.makeToolbar goog.ui.editor.DefaultToolbar (clj->js buttons) node)))
+    (.makeToolbar goog.ui.editor.DefaultToolbar items node)))
 
 (defn- calculate-base-z-index [node]
   (let [z-ancestor (goog.dom/getAncestor
@@ -85,30 +72,22 @@
       (int (aget (.getComputedStyle js/window z-ancestor) "z-index"))
       0)))
 
-(defn create-editor
-  ([field-node-id toolbar-node-id]
-   (create-editor field-node-id toolbar-node-id {}))
-  ([field-node-id toolbar-node-id options]
-   (let [field (create-field field-node-id)
-         toolbar (create-toolbar toolbar-node-id)
-         controller (goog.ui.editor.ToolbarController. field toolbar)
-         event-handlers (or (:events options) [])
-         base-z-index (calculate-base-z-index (.-originalElement field))]
+(defn create-editor [field-node-id toolbar-node-id]
+  (let [field (create-field field-node-id)
+        toolbar-buttons buttons
+        toolbar (create-toolbar toolbar-node-id (clj->js buttons))
+        controller (goog.ui.editor.ToolbarController. field toolbar)
+        base-z-index (calculate-base-z-index (.-originalElement field))]
 
-     (.setBaseZindex field base-z-index)
+    (.setBaseZindex field base-z-index)
 
-     (doseq [[event-name callback] event-handlers]
-       (if-let [goog-event (events event-name)]
-         (events/listen field goog-event callback)
-         (.warn js/console (str "Ignorning unknown event `" event-name "`"))))
+    ;; The field initial state is disabled, so set the controller/toolbar initial state to match.
+    (.setEnabled controller false)
+    (.setVisible controller false)
 
-     ;; The field initial state is disabled, so set the controller/toolbar initial state to match.
-     (.setEnabled controller false)
-     (.setVisible controller false)
-
-     {:controller controller
-      :field field
-      :toolbar toolbar})))
+    {:controller controller
+     :field field
+     :toolbar toolbar}))
 
 (defn detach-editor [{:keys [controller field toolbar]}]
   (doseq [disposable [controller field toolbar]]

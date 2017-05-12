@@ -1,6 +1,8 @@
 (ns reagent-goog-editor.component
   (:require [reagent.core :as reagent]
-            [reagent-goog-editor.goog-editor :as editor]))
+            [reagent-goog-editor.goog-editor :as editor]
+            [reagent-goog-editor.plugin-api :as plugin-api]
+            [reagent-goog-editor.plugin-registry :as plugin-registry]))
 
 (def display-name "reagent-goog-editor")
 (def id-counter (atom 0))
@@ -19,7 +21,7 @@
   (reagent.impl.component/extract-props prop-wrapper))
 
 (defn component-did-mount [this]
-  (let [{:keys [read-only value-ratom]} (extract-props (.. this -props -argv))
+  (let [{:keys [plugins read-only value-ratom]} (extract-props (.. this -props -argv))
         field-node (.. this -refs -field)
         toolbar-node (.. this -refs -toolbar)
         state-atom (reagent/state-atom this)
@@ -28,12 +30,24 @@
         on-change (fn [evnt]
                    (let [contents (editor/get-field-contents (.-target evnt))]
                      (reset! value-ratom contents)))
-        options {:events {:change on-change}}
-        editor (editor/create-editor field-id toolbar-id options)]
+        plugins (-> (or plugins [])
+                    (conj [plugin-registry/events [[:change on-change]]]))
+        editor (editor/create-editor field-id toolbar-id)]
 
     (set-editor-state editor {:read-only read-only
                               :value @value-ratom})
-    (swap! state-atom assoc :editor editor)))
+    (swap! state-atom assoc :editor editor :plugins plugins)
+
+    (doseq [[plugin plugin-opts] plugins]
+        (try
+         (plugin-api/attach plugin editor plugin-opts)
+         (catch js/Object err
+           (.log js/console (str "Error attaching plugin "
+                                 (plugin-api/name plugin)
+                                 " with options "
+                                 (.toString plugin-opts)
+                                 ": "
+                                 (.toString err))))))))
 
 (defn component-will-receive-props [this next-props]
   (let [props (extract-props next-props)
@@ -47,6 +61,17 @@
   (let [state (reagent/state this)
         editor (:editor state)]
     (when editor
+      (when-let [plugins (:plugins state)]
+        (doseq [[plugin plugin-opts] plugins]
+          (try
+           (plugin-api/detach plugin editor plugin-opts)
+           (catch js/Object err
+             (.log js/console (str "Error detaching plugin "
+                                   (plugin-api/name plugin)
+                                   " with options "
+                                   (.toString plugin-opts)
+                                   ": "
+                                   (.toString err)))))))
       (editor/detach-editor editor))))
 
 (defn render-wrapper [props]
