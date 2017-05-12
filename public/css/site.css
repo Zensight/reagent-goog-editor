@@ -1591,3 +1591,9 @@ div.tr_multi_bubble div.tr_bubble_panel {
   background-color: white;
   border: 1px solid grey;
 }
+
+#event-log {
+  height: 8em;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
