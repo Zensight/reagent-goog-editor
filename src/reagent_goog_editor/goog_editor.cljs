@@ -15,9 +15,9 @@
               [goog.editor.plugins.SpacesTabHandler :as spaces-tab-handler]
               [goog.editor.plugins.UndoRedo :as undo-redo]
               [goog.ui.editor.DefaultToolbar :as default-toolbar]
-              [goog.ui.editor.ToolbarController :as toolbar-controller]
               [reagent-goog-editor.editor-plugins.blockquote :as blockquote-plugin]
-              [reagent-goog-editor.commands.separator :as separator]))
+              [reagent-goog-editor.commands.separator :as separator]
+              [reagent-goog-editor.toolbar.controller :as toolbar-controller]))
 
 (def editor-plugins [goog.editor.plugins.BasicTextFormatter
                      goog.editor.plugins.EnterHandler
@@ -76,7 +76,7 @@
   (let [field (create-field field-node-id)
         toolbar-buttons buttons
         toolbar (create-toolbar toolbar-node-id (clj->js buttons))
-        controller (goog.ui.editor.ToolbarController. field toolbar)
+        controller (toolbar-controller/constructor field toolbar)
         base-z-index (calculate-base-z-index (.-originalElement field))]
 
     (.setBaseZindex field base-z-index)
