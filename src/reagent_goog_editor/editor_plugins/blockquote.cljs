@@ -21,15 +21,18 @@
       "+BLOCKQUOTE"
       (this-as this
         (.execCommand (.document this) "formatBlock" false "blockquote")
-        (let [fieldNode (.-field (.. this getFieldObject))
-              focusNode (.. this getFieldObject getRange getStartNode)
-              blockquote (or (goog.dom/getAncestor focusNode
+        (let [field-node (.. this getFieldObject -field)
+              selection (.. this getFieldObject getRange)
+              focus-node (if selection
+                          (.getStartNode selection)
+                          field-node)
+              blockquote (or (goog.dom/getAncestor focus-node
                                                    (fn [node] (= (.-tagName node) "BLOCKQUOTE"))
                                                    true)
-                             (and (not= focusNode fieldNode)
-                                  (.-firstChild focusNode)))]
+                             (and (not= focus-node field-node)
+                                  (.-firstChild focus-node)))]
           (when (and blockquote
-                     (goog.dom/contains fieldNode blockquote))
+                     (goog.dom/contains field-node blockquote))
             (.add (.-classList blockquote) css-class-name)
             (aset (.-style blockquote) "cssText" ltr-style))))))
 

@@ -112,6 +112,9 @@
           (do
             (.makeEditable field)
             (.setEnabled controller true)
+            ;; place cursor at start to avoid some edge cases related to getting
+            ;; a handle on a range before the field has received focus.
+            (.placeCursorAtStart field)
             (.setVisible controller true)))))))
 
 (defn get-field-contents [field]
