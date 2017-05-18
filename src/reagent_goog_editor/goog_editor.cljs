@@ -50,7 +50,8 @@
               goog.editor.Command.INDENT
               goog.editor.Command.BLOCKQUOTE
               separator/SEPARATOR
-              goog.editor.Command.REMOVE_FORMAT])
+              goog.editor.Command.REMOVE_FORMAT
+              separator/SEPARATOR])
 
 (defn- create-field [node-id]
   (let [field (goog.editor.ContentEditableField. node-id)]

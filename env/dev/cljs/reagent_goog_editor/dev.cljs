@@ -9,6 +9,21 @@
 (def read-only (reagent/atom false))
 (def visible (reagent/atom true))
 (def value (reagent/atom ""))
+(def snippet-counter (atom 0))
+
+(defn dynamic-snippet [dom-helper]
+  (swap! snippet-counter inc)
+  (.createDom dom-helper "span" nil (str "Snippet #" @snippet-counter)))
+
+(def snippets-opts {:caption "Snippets"
+                    :class-names "tr-snippet-menu"
+                    :id "insert-snippet"
+                    :snippets [{:name "Hello World"}
+                               {:name "Insert `Hiya Pal`"
+                                :value "Hiya Pal"}
+                               {:name "Dynamic Snippet"
+                                :value dynamic-snippet}]
+                    :tooltip "Snippets"})
 
 (defn component []
   [:div
@@ -26,7 +41,8 @@
       [:hr]
       (when @visible
         [reagent-goog-editor/component {:field {:class-name "composer"}
-                                        :plugins [[plugin-registry/event-log "event-log"]]
+                                        :plugins [[plugin-registry/event-log "event-log"]
+                                                  [plugin-registry/snippets snippets-opts]]
                                         :read-only @read-only
                                         :value-ratom value}])
       [:hr]
