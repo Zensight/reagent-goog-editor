@@ -10,32 +10,19 @@
 (defn next-id []
   (swap! id-counter inc))
 
-(defn- set-editor-state [editor {:keys [value read-only]}]
-  (when (not (nil? value))
-    (editor/set-html editor value))
-
-  (when (not (nil? read-only))
-    (editor/toggle-read-only editor read-only)))
-
 (defn- extract-props [prop-wrapper]
   (reagent.impl.component/extract-props prop-wrapper))
 
 (defn component-did-mount [this]
-  (let [{:keys [plugins read-only value-ratom]} (extract-props (.. this -props -argv))
+  (let [props (extract-props (.. this -props -argv))
         field-node (.. this -refs -field)
         toolbar-node (.. this -refs -toolbar)
         state-atom (reagent/state-atom this)
         field-id (.-id field-node)
         toolbar-id (.-id toolbar-node)
-        on-change (fn [evnt]
-                   (let [contents (editor/get-field-contents (.-target evnt))]
-                     (reset! value-ratom contents)))
-        plugins (-> (or plugins [])
-                    (conj [plugin-registry/events [[:change on-change]]]))
+        plugins (or (:plugins props) [])
         editor (editor/create-editor field-id toolbar-id)]
 
-    (set-editor-state editor {:read-only read-only
-                              :value @value-ratom})
     (swap! state-atom assoc :editor editor :plugins plugins)
 
     (doseq [[plugin plugin-opts] plugins]
@@ -48,14 +35,6 @@
                                  (.toString plugin-opts)
                                  ": "
                                  (.toString err))))))))
-
-(defn component-will-receive-props [this next-props]
-  (let [props (extract-props next-props)
-        state (reagent/state this)
-        {:keys [read-only value-ratom]} props
-        editor (:editor state)]
-    (set-editor-state editor {:read-only read-only
-                              :value @value-ratom})))
 
 (defn component-will-unmount [this]
   (let [state (reagent/state this)
@@ -103,7 +82,6 @@
 
 (def component-config
   {:component-did-mount component-did-mount
-   :component-will-receive-props component-will-receive-props
    :component-will-unmount component-will-unmount
    :display-name display-name
    :reagent-render reagent-render})

@@ -37,14 +37,18 @@
        [:td
         [:button
          {:on-click #(swap! visible not)}
-         "Show/remove editor"]]]]]
+         "Show/remove editor"]]
+       [:td
+        [:button
+         {:on-click #(reset! value "<h2>Hello, World!</h2>")}
+         "Set content to `Hello, World!`"]]]]]
       [:hr]
       (when @visible
         [reagent-goog-editor/component {:field {:class-name "composer"}
                                         :plugins [[plugin-registry/event-log "event-log"]
-                                                  [plugin-registry/snippets snippets-opts]]
-                                        :read-only @read-only
-                                        :value-ratom value}])
+                                                  [plugin-registry/snippets snippets-opts]
+                                                  [plugin-registry/value-ratom value]
+                                                  [plugin-registry/read-only-ratom read-only]]}])
       [:hr]
       [:div
        [:span "Editor Inner HTML"]
