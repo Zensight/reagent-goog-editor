@@ -90,9 +90,16 @@
      :field field
      :toolbar toolbar}))
 
+(defn disposed? [editor-or-field]
+  (let [field (if (map? editor-or-field)
+                (:field editor-or-field)
+                editor-or-field)]
+    (.getDisposed field)))
+
 (defn detach-editor [{:keys [controller field toolbar]}]
-  (doseq [disposable [controller field toolbar]]
-    (when disposable (.dispose disposable))))
+  (when-not (disposed? field)
+    (doseq [disposable [controller field toolbar]]
+      (when disposable (.dispose disposable)))))
 
 (defn read-only? [editor]
   (let [field (:field editor)]
@@ -104,7 +111,8 @@
   ([editor make-read-only?]
     (let [field (:field editor)
           controller (:controller editor)]
-      (when (not= (read-only? editor) make-read-only?)
+      (when-not (or (disposed? field)
+                    (= (read-only? editor) make-read-only?))
         (if make-read-only?
           (do
             (.makeUneditable field)
@@ -119,7 +127,8 @@
             (.setVisible controller true)))))))
 
 (defn get-field-contents [field]
-  (.getCleanContents field))
+  (when-not (disposed? field)
+    (.getCleanContents field)))
 
 (defn get-editor-contents [editor]
   (-> editor
@@ -127,7 +136,8 @@
       get-field-contents))
 
 (defn set-html [editor html]
-  (when (not= html (get-editor-contents editor))
+  (when-not (or (disposed? editor)
+                (= html (get-editor-contents editor)))
     (-> editor
          :field
         (.setHtml
