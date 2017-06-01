@@ -1,4 +1,4 @@
-(defproject reagent-goog-editor "0.1.1-SNAPSHOT"
+(defproject reagent-goog-editor "1.0.0-SNAPSHOT"
   :description "Reagent wrapper around goog.editor"
   :url "https://github.com/Zensight/reagent-goog-editor"
   :license {:name "Copyright 2017 Zensight"
