@@ -22,12 +22,14 @@
                 field-node (.-field field-obj)]
             ;; Make sure the selection belongs to the field node!
             (when (dom/contains field-node focus-node)
-              (let [node (if (= (type argv) js/Function)
-                           (argv dom-helper)
-                           (.createDom dom-helper "span" nil argv))]
+              (let [content (if (= (type argv) js/Function)
+                              (argv dom-helper)
+                              (.createDom dom-helper "span" nil argv))
+                    nodes (if (.-length content) content [content])]
                 (.removeContents selection)
-                (.replaceContentsWithNode selection node)
-                (.placeCursorNextTo goog.editor.range node false))))))))
+                (doseq [node nodes]
+                  (.insertNode selection node true))
+                (.placeCursorNextTo goog.editor.range (last nodes) false))))))))
 
   (getTrogClassId []
     "RGE-SNIP")

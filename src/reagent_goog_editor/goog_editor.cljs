@@ -16,6 +16,7 @@
               [goog.editor.plugins.UndoRedo :as undo-redo]
               [goog.ui.editor.DefaultToolbar :as default-toolbar]
               [reagent-goog-editor.editor-plugins.blockquote :as blockquote-plugin]
+              [reagent-goog-editor.editor-plugins.chips :as chips-plugin]
               [reagent-goog-editor.commands.separator :as separator]
               [reagent-goog-editor.toolbar.controller :as toolbar-controller]))
 
@@ -28,7 +29,8 @@
                      goog.editor.plugins.RemoveFormatting
                      goog.editor.plugins.SpacesTabHandler
                      goog.editor.plugins.UndoRedo
-                     blockquote-plugin/Blockquote])
+                     blockquote-plugin/Blockquote
+                     chips-plugin/new-instance])
 
 (def buttons [goog.editor.Command.FONT_FACE
               goog.editor.Command.FONT_SIZE

@@ -13,7 +13,9 @@
 
 (defn dynamic-snippet [dom-helper]
   (swap! snippet-counter inc)
-  (.createDom dom-helper "span" nil (str "Snippet #" @snippet-counter)))
+  (let [elem (.createDom dom-helper "span" nil (str "Snippet #" @snippet-counter))]
+    (aset elem "contentEditable" "false")
+    elem))
 
 (def snippets-opts {:caption "Snippets"
                     :class-names "tr-snippet-menu"
@@ -41,7 +43,11 @@
        [:td
         [:button
          {:on-click #(reset! value "<h2>Hello, World!</h2>")}
-         "Set content to `Hello, World!`"]]]]]
+         "Set content to `Hello, World!`"]]
+       [:td
+        [:button
+         {:on-click #(reset! value "left &#8203;<span class=\"gmail_chip\" style=\"outline: solid 1px black;\">Chippy</span>&#8203; right")}
+         "Insert chip"]] ]]]
       [:hr]
       (when @visible
         [reagent-goog-editor/component {:field {:class-name "composer"}
